@@ -13,6 +13,7 @@ Send a POST request::
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 import SocketServer
 from word_param import HangmanGame
+import json
 
 class GameControl(object):
     def __init__(self):
@@ -24,11 +25,12 @@ class GameControl(object):
         self.word = self.myobj.get_word()
         self.status = 'Playing'
 
-    def continueGame(self):
+    def continueGame(self, key=None):
         if self.myobj.word == self.myobj.display:
             print 'Game Won'
         else:
-            print 'Make a Guess'
+            self.myobj.hand(key)
+            print 'Made a Guess'
 
 gc = GameControl()
 
@@ -39,13 +41,12 @@ class S(BaseHTTPRequestHandler):
         self.end_headers()
 
     def do_GET(self):
+        if self.path == '/newGame':
+            gc.status = None
         self._set_headers()
         if gc.status == None:
             gc.newGame()
-        else:
-            gc.continueGame()
-        #self.wfile.write("<html><body><h1>hi!</h1></body></html>")
-        f = open('index.html')
+        f = open('buffer.html')
         self.send_response(200)
         self.send_header('Content-type',    'text/html')
         self.end_headers()
@@ -57,8 +58,16 @@ class S(BaseHTTPRequestHandler):
 
     def do_POST(self):
         # Doesn't do anything with posted data
-        self._set_headers()
-        self.wfile.write("<html><body><h1>POST!</h1></body></html>")
+        if self.path == '/guessAlpha':
+            content_len = int(self.headers.getheader('content-length'))
+            post_body = self.rfile.read(content_len)
+            gc.continueGame(post_body[-1])
+            f = open('buffer.html')
+            self.send_response(200)
+            self.send_header('Content-type',    'text/html')
+            self.end_headers()
+            self.wfile.write(f.read())
+            f.close()
 
 def run(server_class=HTTPServer, handler_class=S, port=80):
     server_address = ('', port)

@@ -1,0 +1,2 @@
+<html><body><h2>_ _ _ _ _ _
+</h2><button onclick="/newGame"> New Game </button></body></html>
