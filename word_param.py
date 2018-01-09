@@ -14,6 +14,7 @@ class HangmanGame(object):
         for e in f.readlines():
             a.append(e[:-1])
         temp = random.choice(a)
+        print 'word to be guessed ', temp
         self.word = [e for e in temp]
         self.display = ['_' for e in temp]
         self.missed = set()
@@ -28,6 +29,12 @@ class HangmanGame(object):
                 flag = True
         if not flag:
             self.missed.add(key)
+            if len(self.missed) > 9:
+                self.losewrite()
+                return
+        if self.word == self.display:
+            self.winwrite()
+            return
         self.buffwrite()
 
 
@@ -67,4 +74,22 @@ class HangmanGame(object):
         </select>")
         f.write("<input type=\"submit\" value=\"Submit\"></form>")
         f.write('alphabets you have guessed so far - ' + ', '.join(list(self.missed)) + '\n')
+        f.write("<a href=\"/newGame\"<button onclick=\"\"> New Game </button></a></body></html>")
+
+    def losewrite(self):
+        f = open('buffer.html', 'w')
+        f.write("<html><body><h2>")
+        f.write(' '.join(self.display) + '\n')
+        f.write("</h2>")
+        f.write('alphabets you have guessed so far - ' + ', '.join(list(self.missed)) + '\n')
+        f.write("<h1>You lost !!!! Play a new game. The word was " + ''.join(self.word) + "</h1>" )
+        f.write("<a href=\"/newGame\"<button onclick=\"\"> New Game </button></a></body></html>")
+
+    def winwrite(self):
+        f = open('buffer.html', 'w')
+        f.write("<html><body><h2>")
+        f.write(' '.join(self.display) + '\n')
+        f.write("</h2>")
+        f.write('alphabets you have guessed so far - ' + ', '.join(list(self.missed)) + '\n')
+        f.write("<h1>Correct !!!! You win. Play again?</h1>")
         f.write("<a href=\"/newGame\"<button onclick=\"\"> New Game </button></a></body></html>")
