@@ -7,6 +7,7 @@ class HangmanGame(object):
         self.display = []
         self.missed = set()
         self.status = False
+        self.chance = 10
 
     def get_word(self):
         f = open('words.txt', 'r')
@@ -14,6 +15,7 @@ class HangmanGame(object):
         for e in f.readlines():
             a.append(e[:-1])
         temp = random.choice(a)
+        temp = temp.lower()
         print 'word to be guessed ', temp
         self.word = [e for e in temp]
         self.display = ['_' for e in temp]
@@ -39,6 +41,11 @@ class HangmanGame(object):
 
 
     def buffwrite(self):
+        f = open('stat.txt', 'r')
+        a = []
+        for e in f.readlines():
+            a.append(e[:-1])
+        f.close()
         f = open('buffer.html', 'w')
         f.write("<html><body><h2>")
         f.write(' '.join(self.display) + '\n')
@@ -72,11 +79,19 @@ class HangmanGame(object):
           <option value=\"y\">y</option>\
           <option value=\"z\">z</option>\
         </select>")
-        f.write("<input type=\"submit\" value=\"Submit\"></form>")
-        f.write('alphabets you have guessed so far - ' + ', '.join(list(self.missed)) + '\n')
+        f.write("<input type=\"submit\" value=\"Submit\"></form> You have " + str(10 - len(self.missed)) + " chances left")
+        f.write('alphabets you have guessed so far - ' + ', '.join(list(self.missed)) + '<br>')
+        f.write('Games won so far ' + str(a[0]) + ' <br>Games lost so far ' + str(a[1]) + '<br>')
         f.write("<a href=\"/newGame\"<button onclick=\"\"> New Game </button></a></body></html>")
 
     def losewrite(self):
+        f = open('stat.txt', 'r')
+        a = []
+        for e in f.readlines():
+            a.append(e[:-1])
+        a[1] = int(a[1]) + 1
+        f = open('stat.txt', 'w')
+        f.write(str(a[0])+'\n'+str(a[1])+'\n')
         f = open('buffer.html', 'w')
         f.write("<html><body><h2>")
         f.write(' '.join(self.display) + '\n')
@@ -86,6 +101,14 @@ class HangmanGame(object):
         f.write("<a href=\"/newGame\"<button onclick=\"\"> New Game </button></a></body></html>")
 
     def winwrite(self):
+        f = open('stat.txt', 'r')
+        a = []
+        for e in f.readlines():
+            a.append(e[:-1])
+        a[0] = int(a[0]) + 1
+        f = open('stat.txt', 'w')
+        f.write(str(a[0])+'\n'+str(a[1])+'\n')
+        f.close()
         f = open('buffer.html', 'w')
         f.write("<html><body><h2>")
         f.write(' '.join(self.display) + '\n')
